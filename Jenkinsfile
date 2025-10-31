@@ -7,6 +7,7 @@ pipeline {
     }
     parameters {
         choice(name: 'ENVIRONMENT', choices: ['dev', 'qa', 'prod'], description: 'Select deployment environment')
+        choice(name: 'STATUS', choices: ['run', 'stop', 'remove'], description: 'Select whether to run or stop or remove the Docker container')
     }
 
     stages {
@@ -22,15 +23,31 @@ pipeline {
                 }
             }
         }
-        stage('Build Docker Image') {
+        stage('Run Docker Container Locally using docker-compose') {
+            when {
+                allOf {
+                    expression { return params.ENVIRONMENT == 'dev' }
+                    expression { return params.STATUS == 'run' }
+                }
+            }
             steps {
                 script {
-                    if (ENVIRONMENT == 'dev') {
-                        echo "Dev environment detected — Building Docker image"
-                        sh "sudo docker build -t ${DOCKERHUB_USERNAME}/${PROJECT_NAME}:${env.BUILD_ID} ."
-                    } else {
-                        echo "Skipping Docker build — ENVIRONMENT=${ENVIRONMENT}"
-                    }
+                    echo "Running Docker container locally using docker-compose"
+                    sh "sudo docker-compose up -d"
+                }
+            }
+        }
+        stage('Remove Docker Container Locally using docker-compose') {
+            when {
+                allOf {
+                    expression { return params.ENVIRONMENT == 'dev' }
+                    expression { return params.STATUS == 'remove' }
+                }
+            }
+            steps {
+                script {
+                    echo "Stopping Docker container locally using docker-compose"
+                    sh "sudo docker-compose down"
                 }
             }
         }
