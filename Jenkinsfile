@@ -2,8 +2,9 @@ pipeline {
     agent any
 
     environment {
-        PROJECT_NAME = 'spring-redis-sak-app'
+        PROJECT_NAME = 'spring_redis_sak_app'
         DEPLOY_ENV = 'production'
+        DOCKERHUB_USERNAME = 'sakit333'
     }
     stages {
         stage("check docker is installed or not") {
@@ -17,6 +18,13 @@ pipeline {
                     } else {
                         error "Docker is not installed. Please install Docker to proceed."
                     }
+                }
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh "sudo docker build -t ${DOCKERHUB_USERNAME}/${PROJECT_NAME}:${env.BUILD_ID} ."
                 }
             }
         }
