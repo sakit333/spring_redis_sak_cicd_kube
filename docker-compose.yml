@@ -1,42 +1,42 @@
-version: "3.9"
+  version: "3.9"
 
-services:
-  redis:
-    image: redis:7-alpine
-    container_name: sak_redis
-    command: ["redis-server", "--appendonly", "yes"]
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "PING"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-    restart: always
-    networks:
-      - sak-network
+  services:
+    redis:
+      image: redis:7-alpine
+      container_name: sak_redis
+      command: ["redis-server", "--appendonly", "yes"]
+      ports:
+        - "6379:6379"
+      volumes:
+        - redis-data:/data
+      healthcheck:
+        test: ["CMD", "redis-cli", "PING"]
+        interval: 5s
+        timeout: 3s
+        retries: 10
+      restart: always
+      networks:
+        - sak-network
 
-  app:
-    build: .
-    image: sak_redis_app:latest
-    container_name: sak_app
-    environment:
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: 6379
-    depends_on:
-      redis:
-        condition: service_healthy
-    ports:
-      - "8084:8084"
-    restart: always
-    networks:
-      - sak-network
+    app:
+      build: .
+      image: sak_redis_app:latest
+      container_name: sak_app
+      environment:
+        SPRING_REDIS_HOST: redis
+        SPRING_REDIS_PORT: 6379
+      depends_on:
+        redis:
+          condition: service_healthy
+      ports:
+        - "8084:8084"
+      restart: always
+      networks:
+        - sak-network
 
-networks:
-  sak-network:
-    driver: bridge
+  networks:
+    sak-network:
+      driver: bridge
 
-volumes:
-  redis-data:
+  volumes:
+    redis-data:
