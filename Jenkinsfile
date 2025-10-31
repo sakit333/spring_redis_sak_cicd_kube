@@ -6,6 +6,10 @@ pipeline {
         DEPLOY_ENV = 'production'
         DOCKERHUB_USERNAME = 'sakit333'
     }
+    parameters {
+        choice(name: 'ENVIRONMENT', choices: ['dev', 'qa', 'prod'], description: 'Select deployment environment')
+    }
+
     stages {
         stage("check docker is installed or not") {
             steps {
@@ -24,7 +28,12 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "sudo docker build -t ${DOCKERHUB_USERNAME}/${PROJECT_NAME}:${env.BUILD_ID} ."
+                    if (ENVIRONMENT == 'dev') {
+                        echo "Dev environment detected — Building Docker image"
+                        sh "docker build -t ${DOCKERHUB_USERNAME}/${PROJECT_NAME}:${env.BUILD_ID} ."
+                    } else {
+                        echo "Skipping Docker build — ENVIRONMENT=${ENVIRONMENT}"
+                    }
                 }
             }
         }
