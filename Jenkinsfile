@@ -32,8 +32,12 @@ pipeline {
             }
             steps {
                 script {
-                    echo "Running Docker container locally using docker-compose"
-                    sh "sudo docker-compose up -d"
+                    echo "Running Docker container Dev Env using docker-compose"
+                    sh """
+                        sudo docker-compose down
+                        sudo docker-compose build --no-cache
+                        sudo docker-compose up -d
+                    """
                 }
             }
         }
@@ -47,7 +51,7 @@ pipeline {
             steps {
                 script {
                     echo "Stopping Docker container locally using docker-compose"
-                    sh "sudo docker-compose down"
+                    sh "sudo docker-compose down -v"
                 }
             }
         }
