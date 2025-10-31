@@ -23,7 +23,7 @@ services:
     image: sak_redis_app:latest
     container_name: sak_app
     environment:
-      SPRING_REDIS_HOST: sak_redis
+      SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: 6379
     depends_on:
       redis:
