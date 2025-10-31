@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sak
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data
+  namespace: sak
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: sak
+spec:
+  serviceName: "redis"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        command: ["redis-server", "--appendonly", "yes"]
+        ports:
+          - containerPort: 6379
+        volumeMounts:
+          - name: redis-data
+            mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: sak
+spec:
+  ports:
+    - port: 6379
+  selector:
+    app: redis
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sak-app
+  namespace: sak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sak-app
+  template:
+    metadata:
+      labels:
+        app: sak-app
+    spec:
+      containers:
+      - name: sak-app
+        image: sak_redis_app:latest # replace after pushing to registry
+        ports:
+          - containerPort: 8084
+        env:
+        - name: SPRING_REDIS_HOST
+          value: "redis.sak.svc.cluster.local"
+        - name: SPRING_REDIS_PORT
+          value: "6379"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sak-app
+  namespace: sak
+spec:
+  type: NodePort  # <-- change to LoadBalancer if needed
+  selector:
+    app: sak-app
+  ports:
+  - port: 8084
+    targetPort: 8084
+    nodePort: 30084   # Access as http://node-ip:30084
