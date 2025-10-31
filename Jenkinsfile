@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         PROJECT_NAME = 'spring_redis_sak_app'
-        DEPLOY_ENV = 'production'
         DOCKERHUB_USERNAME = 'sakit333'
     }
     parameters {
@@ -17,8 +16,6 @@ pipeline {
                     def dockerExists = sh(script: 'which docker', returnStatus: true) == 0
                     if (dockerExists) {
                         echo "Docker is installed."
-                        sh "sudo docker images"
-                        sh "sudo docker ps -a"
                     } else {
                         error "Docker is not installed. Please install Docker to proceed."
                     }
@@ -30,7 +27,7 @@ pipeline {
                 script {
                     if (ENVIRONMENT == 'dev') {
                         echo "Dev environment detected — Building Docker image"
-                        sh "docker build -t ${DOCKERHUB_USERNAME}/${PROJECT_NAME}:${env.BUILD_ID} ."
+                        sh "sudo docker build -t ${DOCKERHUB_USERNAME}/${PROJECT_NAME}:${env.BUILD_ID} ."
                     } else {
                         echo "Skipping Docker build — ENVIRONMENT=${ENVIRONMENT}"
                     }
