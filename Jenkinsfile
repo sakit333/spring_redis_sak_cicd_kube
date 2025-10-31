@@ -12,8 +12,8 @@ pipeline {
                     def dockerExists = sh(script: 'which docker', returnStatus: true) == 0
                     if (dockerExists) {
                         echo "Docker is installed."
-                        sh "docker images"
-                        sh "docker ps -a"
+                        sh "sudo docker images"
+                        sh "sudo docker ps -a"
                     } else {
                         error "Docker is not installed. Please install Docker to proceed."
                     }
