@@ -23,7 +23,7 @@ pipeline {
                 }
             }
         }
-        stage('Run Docker Container Locally using docker-compose') {
+        stage('Run Docker Container Dev Env using docker-compose') {
             when {
                 allOf {
                     expression { return params.ENVIRONMENT == 'dev' }
@@ -37,7 +37,7 @@ pipeline {
                 }
             }
         }
-        stage('Remove Docker Container Locally using docker-compose') {
+        stage('Remove Docker Container Dev Env using docker-compose') {
             when {
                 allOf {
                     expression { return params.ENVIRONMENT == 'dev' }
