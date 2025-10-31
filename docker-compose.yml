@@ -29,7 +29,7 @@ services:
       redis:
         condition: service_healthy
     ports:
-      - "8084:8080"
+      - "8084:8084"
     restart: always
     networks:
       - sak-network
