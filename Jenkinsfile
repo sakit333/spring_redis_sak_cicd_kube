@@ -10,6 +10,7 @@ pipeline {
             steps {
                 sh 'ls -al'
                 sh 'pwd'
+            }
         }
     }
     post {
