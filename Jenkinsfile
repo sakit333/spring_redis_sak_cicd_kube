@@ -52,6 +52,7 @@ pipeline {
                 script {
                     echo "Stopping Docker container locally using docker-compose"
                     sh "sudo docker-compose down -v"
+                    sh "sudo docker rmi -f $(sudo docker images -q)"
                 }
             }
         }
